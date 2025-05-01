@@ -22,7 +22,9 @@ discord-clockify-bot/
 ├── config/
 │   ├── __init__.py
 │   ├── settings.py             # Carregamento de variáveis do ambiente (.env)
-│   └── users_map.json          # Mapeamento de usuários Discord → Clockify
+│   ├── config_loader.py        # Funções utilitárias para acesso às configurações
+│   ├── config.json             # Configuração real com chaves (não versionar)
+│   └── config.json.sample      # Exemplo de configuração (pode versionar)
 │
 ├── .env                        # Variáveis de ambiente sensíveis (não versionar)
 ├── .gitignore                  # Ignorar arquivos sensíveis e de build
@@ -33,13 +35,11 @@ discord-clockify-bot/
 
 ## Descrição dos Principais Arquivos
 
-- `run.py`: script simples para iniciar o bot. Exemplo:
-- `bot/main.py`: contém a configuração do client do Discord e o evento principal.
+- `run.py`: script simples para iniciar o bot.
+- `bot/main.py`: contém a configuração do client do Discord e os eventos principais.
 - `bot/voice_handler.py`: escuta `on_voice_state_update` e aciona os métodos do `clockify_client`.
 - `bot/clockify_client.py`: implementa chamadas HTTP para iniciar e encerrar os timers no Clockify.
-- `bot/user_registry.py`: carrega e consulta o `users_map.json`.
-- `config/settings.py`: encapsula as variáveis de ambiente com o uso de `os.getenv()` e `dotenv`.
-
+- `config/settings.py`: encapsula as variáveis de ambiente com o uso de `dotenv`, carrega `config.json`.
 
 ---
 
@@ -59,10 +59,20 @@ discord-clockify-bot/
 
 ```env
 DISCORD_TOKEN=seu_token_do_bot
-CLOCKIFY_API_KEY=sua_api_key_clockify
-CLOCKIFY_WORKSPACE_ID=workspace_id
-CLOCKIFY_PROJECT_ID=project_id_opcional
+LOG_LEVEL=INFO
 ```
+
+> O arquivo `.env` contém variáveis de ambiente sensíveis (como o token do bot).
+> 
+> - **Não versionar**: adicione `.env` ao `.gitignore`.
+> - Use o arquivo `.env.sample` como base para configurar o seu ambiente:
+>
+> ```bash
+> cp .env.sample .env
+> ```
+>
+> Em produção, pode-se definir essas variáveis diretamente no ambiente ou em um arquivo `.env` montado como volume no container.
+
 
 ---
 
@@ -72,25 +82,25 @@ Exemplo de mapeamento de usuários Discord para usuários do Clockify:
 
 ```json
 {
-  "discord_user_id": {
-    "clockify_user_id": "clokify_user_id",
-    "nome": "Nome do Usuário" // opcional
+  "discord_channels": {
+    "DISCORD_CHANNEL_ID_EXEMPLO": {
+      "clockify_workspace_id": "WORKSPACE_ID_EXEMPLO",
+      "clockify_project_id": "PROJECT_ID_EXEMPLO",
+      "discord_server_id": "DISCORD_SERVER_ID_EXEMPLO"
+    }
+  },
+  "discord_users": {
+    "DISCORD_USER_ID-DISCORD_CHANNEL_ID_EXEMPLO": {
+      "clockify_api_key": "SUA_CLOCKIFY_API_KEY",
+      "clockify_user_id": "CLOCKIFY_USER_ID_EXEMPLO",
+      "name": "NOME_DO_USUARIO"
+    }
   }
 }
 ```
-**Exemplo com um usuário**
-    
-```json
-{
-  "123456789012345678": {
-    "clockify_user_id": "609f0b123456789abcdef012",
-    "nome": "Jailton"
-  }
-}
 
-```
 
-> Cada chave deve ser uma **string com o ID do usuário do Discord**, e cada valor deve conter a chave `"clockify_user_id"`.
+>  O arquivo config/config.json não deve ser versionado. Use config.json.sample como base e adicione config.json ao .gitignore.
 
 #### Como obter os IDs
 
@@ -110,9 +120,7 @@ Exemplo de mapeamento de usuários Discord para usuários do Clockify:
 1. Use a API:
 
 ```http
-curl -s \
-  -H "X-Api-Key: CLOCKIFY_API_KEY" \
-  https://api.clockify.me/api/v1/workspaces/CLOCKIFY_WORKSPACE_ID/users
+curl -s -H "X-Api-Key: SUA_API_KEY" https://api.clockify.me/api/v1/workspaces/WORKSPACE_ID/users
 
 ```
 

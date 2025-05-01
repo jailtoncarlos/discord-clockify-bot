@@ -1,0 +1,16 @@
+{
+  "discord_channels": {
+    "DISCORD_CHANNEL_ID_EXEMPLO": {
+      "clockify_workspace_id": "WORKSPACE_ID_EXEMPLO",
+      "clockify_project_id": "PROJECT_ID_EXEMPLO",
+      "discord_server_id": "DISCORD_SERVER_ID_EXEMPLO"
+    }
+  },
+  "discord_users": {
+    "DISCORD_USER_ID-DISCORD_CHANNEL_ID_EXEMPLO": {
+      "clockify_api_key": "SUA_CLOCKIFY_API_KEY",
+      "clockify_user_id": "CLOCKIFY_USER_ID_EXEMPLO",
+      "name": "NOME_DO_USUARIO"
+    }
+  }
+}

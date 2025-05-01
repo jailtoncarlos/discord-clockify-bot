@@ -1,3 +1,6 @@
+# Arquivo com chaves sensíveis
+config/config.json
+
 # PyCharm
 .idea/
 

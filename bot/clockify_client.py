@@ -1,58 +1,81 @@
 import json
-
-import requests
+import logging
 from datetime import datetime, timezone
-from config import settings
+from discord import Member, VoiceState
+import requests
+from discord.channel import VocalGuildChannel
 
-HEADERS = {
-    "X-Api-Key": settings.CLOCKIFY_API_KEY,
-    "Content-Type": "application/json"
-}
+logger = logging.getLogger(__name__)
 
-active_entries = {}  # user_id → entry_id
+# user_id (Discord) → entry_id
+active_entries = {}
 
 
-def start_timer(user_id: int, clockify_user_id: str):
-    url = f"https://api.clockify.me/api/v1/workspaces/{settings.CLOCKIFY_WORKSPACE_ID}/user/{clockify_user_id}/time-entries"
+def build_headers(api_key: str):
+    logger.debug("Construindo headers para a requisição")
+    logger.debug(f"API Key: {api_key}")
+    return {
+        "X-Api-Key": api_key,
+        "Content-Type": "application/json"
+    }
+
+
+def start_timer(member: Member, channel: VocalGuildChannel, user_entry: dict, channel_entry: dict):
+    clockify_user_id = user_entry["clockify_user_id"]
+    clockify_api_key = user_entry["clockify_api_key"]
+    workspace_id = channel_entry["clockify_workspace_id"]
+    project_id = channel_entry.get("clockify_project_id")
+
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspace_id}/user/{clockify_user_id}/time-entries"
+    logger.debug(f"URL: {url}")
 
     data = {
         "start": datetime.now(timezone.utc).isoformat(),
-        "description": "Tempo iniciado via Discord"
+        "description": f"Tempo iniciado por {member.display_name} no canal {channel.name} do Discord",
     }
 
-    if settings.CLOCKIFY_PROJECT_ID:
-        data["projectId"] = settings.CLOCKIFY_PROJECT_ID
+    if project_id:
+        data["projectId"] = project_id
 
-    print(f"[DEBUG] Iniciando timer para {user_id} (Clockify ID: {clockify_user_id})")
-    print(f"[DEBUG] Payload enviado: {json.dumps(data, indent=2)}")
+    logger.debug(f"Iniciando timer para Usuario Discord: {member.display_name} ({member.id}), Usuário Clockify ID: {clockify_user_id}")
+    logger.debug(f"Payload enviado: {json.dumps(data, indent=2)}")
 
-    response = requests.post(url, headers=HEADERS, json=data)
+    response = requests.post(url, headers=build_headers(clockify_api_key), json=data)
 
     if response.status_code == 201:
         entry_id = response.json()["id"]
-        active_entries[user_id] = entry_id
-        print(f"[+] Timer iniciado para {user_id} (entry_id: {entry_id})")
+        active_entries[member.id] = {
+            "entry_id": entry_id,
+            "clockify_user_id": clockify_user_id,
+            "project_config": channel_entry
+        }
+        logger.info(f"Timer iniciado para Usuario Discord: {member.display_name} ({member.id}), Entry ID: {entry_id}")
     else:
-        print(f"[ERRO] Falha ao iniciar timer para {user_id}")
-        print(f"      Status: {response.status_code}")
-        print(f"      Resposta: {response.text}")
+        logger.error(f"Falha ao iniciar timer para Usuario Discord: {member.display_name} ({member.id})")
+        logger.error(f"Status: {response.status_code}")
+        logger.error(f"Resposta: {response.text}")
 
 
-def stop_timer(user_id: int, clockify_user_id: str):
-    url = f"https://api.clockify.me/api/v1/workspaces/{settings.CLOCKIFY_WORKSPACE_ID}/user/{clockify_user_id}/time-entries"
+def stop_timer(member: Member, user_entry: dict, channel_config: dict):
+    clockify_user_id = user_entry["clockify_user_id"]
+    clockify_api_key = user_entry["clockify_api_key"]
+    workspace_id = channel_config["clockify_workspace_id"]
+
+    url = f"https://api.clockify.me/api/v1/workspaces/{workspace_id}/user/{clockify_user_id}/time-entries"
+    logger.debug(f"URL: {url}")
     now = datetime.now(timezone.utc).isoformat()
 
     data = {
         "end": now
     }
 
-    print(f"[DEBUG] Encerrando timer atual para usuário {user_id} (Clockify ID: {clockify_user_id})")
-    print(f"[DEBUG] Payload enviado: {json.dumps(data, indent=2)}")
+    logger.debug(f"Encerrando timer atual para Usuario Discord: {member.display_name} ({member.id}), Usuário Clockify: {clockify_user_id}")
+    logger.debug(f"Payload enviado: {json.dumps(data, indent=2)}")
 
-    response = requests.patch(url, headers=HEADERS, json=data)
+    response = requests.patch(url, headers=build_headers(clockify_api_key), json=data)
 
     if response.status_code == 200:
-        print(f"[-] Timer finalizado com sucesso para {user_id}")
-        active_entries.pop(user_id, None)
+        logger.info(f"Timer finalizado com sucesso para Usuario Discord: {member.display_name} ({member.id})")
+        active_entries.pop(member.id, None)
     else:
-        print(f"[!] Erro ao parar timer: {response.status_code} - {response.text}")
+        logger.error(f"Erro ao parar timer: {response.status_code} - {response.text}")

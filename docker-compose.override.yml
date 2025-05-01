@@ -14,3 +14,7 @@ services:
       options:
         max-size: "10m"    # Limita cada arquivo de log a 10MB
         max-file: "3"      # Mantém no máximo 3 arquivos de log rotacionados
+    volumes:
+      - .:/app
+    environment:
+      PYTHONUNBUFFERED: 1  # Garante que os prints e interações apareçam em tempo real

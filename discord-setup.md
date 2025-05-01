@@ -34,12 +34,12 @@ Este documento orienta a configuração completa da aplicação ClockifyBot no D
      - [x] **Public Bot** (para poder adicionar em servidores)
 
 4. Em **Privileged Gateway Intents**, ative:
-   - [x] **Server Members Intent** ✅ **Obrigatório para mapear o usuário com o Clockify**
+   - [x] **Server Members Intent**,  **Obrigatório para mapear o usuário com o Clockify**
    - [ ] **Presence Intent** (opcional)
    - [ ] **Message Content Intent** (não necessário para este bot)
 5. Clique no botão "Save Changes" para salvar as alterações
 
-> ❌ Não é necessário ativar nenhuma "Voice State Intent" — ela já está disponível por padrão.
+> Não é necessário ativar nenhuma "Voice State Intent" — ela já está disponível por padrão.
 
 ---
 
@@ -54,12 +54,12 @@ Acesse a área **OAuth2 → URL Generator**
 
 Agora, marque as permissões que o ClockifyBot precisa para funcionar:
 
-| Categoria        | Permissão           |
-|------------------|---------------------|
-| ✅ General        | View Channels       |
-| ✅ Voice          | Connect             |
-| ✅ Text           | Send Messages       |
-| ✅ Text           | Read Message History |
+| Categoria | Permissão           |
+|----------|---------------------|
+| General  | View Channels       |
+| Voice    | Connect             |
+| Text     | Send Messages       |
+| Text     | Read Message History |
 
 Essas são as permissões mínimas e suficientes para que o bot:
 
@@ -81,7 +81,7 @@ Será parecida com:
 https://discord.com/oauth2/authorize?client_id=1367513418982096987&permissions=1117184&integration_type=0&scope=bot
 ```
 
-> ⚠️ A URL é válida **somente se o bot ainda existir**, e o `client_id` for o da sua aplicação.
+> A URL é válida **somente se o bot ainda existir**, e o `client_id` for o da sua aplicação.
 
 
 ### 5. Acesse a URL em um navegador, escolha o servidor e autorize o bot.
@@ -118,7 +118,7 @@ Verifique no Discord:
    - **Ler Histórico de Mensagens (Read Message History)** (se necessário)
    - **Enviar Mensagens (Send Messages)** (se desejar que ele registre logs no chat)
 
-> ⚠️ Caso o bot **não tenha uma role** definida, adicione uma e atribua as permissões acima.
+> Caso o bot **não tenha uma role** definida, adicione uma e atribua as permissões acima.
 
 
 #### **6.3 Verificar permissões específicas no canal de voz**
@@ -177,20 +177,13 @@ python run.py
 > Certifique-se de que o arquivo `.env` esteja preenchido com:
 ```env
 DISCORD_TOKEN=seu_token_do_bot
-CLOCKIFY_API_KEY=sua_api_key
-CLOCKIFY_WORKSPACE_ID=seu_workspace_id
-CLOCKIFY_PROJECT_ID=opcional
+LOG_LEVEL=INFO
 ```
+Siga as instruções no README.md para configurar o arquivo `.env` corretamente.
 
-E que `config/users_map.json` tenha o mapeamento correto:
-```json
-{
-  "ID_DO_USUARIO_DISCORD": {
-    "clockify_user_id": "ID_DO_USUARIO_CLOCKIFY"
-  }
-}
-```
+E que `config/config.json` tenha o mapeamento correto:
 
+Siga as intrunções no README.md para configurar o arquivo `config/config.json` corretamente.
 
 
 ### 2. Realize um teste funcional
@@ -208,7 +201,6 @@ E que `config/users_map.json` tenha o mapeamento correto:
   - Se o ID do usuário Discord está corretamente mapeado para o ID do Clockify
   - Se a API Key e o Workspace ID estão corretos
 
-    
 
 ---
 ## Referências
