@@ -1,0 +1,16 @@
+# Permite isolar configurações específicas de desenvolvimento (como logs
+# verbosos, interatividade, volumes locais, etc.) sem comprometer o arquivo
+# principal usado em produção.
+
+services:
+  discord-clockify-bot:
+    # Mantém o terminal interativo (útil para desenvolvimento e depuração)
+    tty: true              # Aloca um pseudo-terminal (equivalente a -t)
+    stdin_open: true       # Mantém o STDIN aberto (equivalente a -i)
+
+    # Configuração de logs (opcional, evita arquivos de log ilimitados)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"    # Limita cada arquivo de log a 10MB
+        max-file: "3"      # Mantém no máximo 3 arquivos de log rotacionados

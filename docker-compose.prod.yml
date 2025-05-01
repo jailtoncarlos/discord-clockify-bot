@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  discord-clockify-bot:
+    container_name: discord-clockify-bot
+    image: jailtoncarlos/discord-clockify-bot:latest  # Substitua com sua imagem publicada no Docker Hub ou outro registry
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./config:/app/config:ro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+    security_opt:
+      - no-new-privileges:true
+    read_only: true
+    tmpfs:
+      - /tmp
+    networks:
+      - bot-net
+
+networks:
+  bot-net:
+    driver: bridge
