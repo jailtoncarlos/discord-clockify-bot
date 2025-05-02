@@ -1,4 +1,4 @@
-# 🕒 Discord Clockify Bot
+# Discord Clockify Bot
 
 [![Docker Build](https://img.shields.io/docker/automated/discord-clockify-bot.svg?label=Docker%20Build&style=flat-square)](https://hub.docker.com/r/discord-clockify-bot)
 [![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=flat-square)](https://www.python.org/downloads/)
