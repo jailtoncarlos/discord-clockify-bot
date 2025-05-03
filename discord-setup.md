@@ -35,8 +35,8 @@ Este documento orienta a configuração completa da aplicação ClockifyBot no D
 
 4. Em **Privileged Gateway Intents**, ative:
    - [x] **Server Members Intent**,  **Obrigatório para mapear o usuário com o Clockify**
-   - [ ] **Presence Intent** (opcional)
-   - [ ] **Message Content Intent** (não necessário para este bot)
+   - [ ] **Presence Intent** (opcional) -- se quiser monitorar status online/ausente, opciona
+   - [x] **Message Content Intent**  -- permite ao bot acessar o conteúdo das mensagens enviadas pelos usuários 
 5. Clique no botão "Save Changes" para salvar as alterações
 
 > Não é necessário ativar nenhuma "Voice State Intent" — ela já está disponível por padrão.

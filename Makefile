@@ -19,3 +19,6 @@ requirements:
 
 clean:
 	rm -rf __pycache__ */__pycache__ *.pyc *.pyo
+
+migrar:
+	docker-compose exec discord-clockify-bot python -m web.commands.migrar_config_json
